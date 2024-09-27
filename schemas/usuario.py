@@ -98,8 +98,6 @@ def apresenta_token(token):
     """ Retorna uma representação de um token seguindo o schema definido em
         AuthSchema.
     """
-    mascara = "%d/%m/%Y %H:%M:%S"
-
     return {
         "token": token
     }

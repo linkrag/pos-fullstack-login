@@ -239,7 +239,7 @@ def login(body: AuthSchema):
                     'exp': datetime.utcnow() + timedelta(hours=1)
                 }, SECRET_KEY, algorithm="HS256")
                 
-                return jsonify(apresenta_token({'token': token if isinstance(token, str) else token.decode('utf-8')})), 200
+                return jsonify({'token': token if isinstance(token, str) else token.decode('utf-8')}), 200
 
         return jsonify({'message': 'Invalid credentials'}), 401
 
