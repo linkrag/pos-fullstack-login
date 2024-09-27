@@ -22,7 +22,7 @@ CORS(app)
 home_tag = Tag(name="Documentação", description="Seleção de documentação: Swagger, Redoc ou RapiDoc")
 empresa_tag = Tag(name="Empresa ", description="Adição, visualização e remoção de uma empresa ")
 usuario_tag = Tag(name="Usuario", description="Adição e remoção de usuarios à empresa ")
-auth_tag = Tag(name="Authentication", description="Endpoints for user authentication")
+auth_tag = Tag(name="Authentication", description="Autenticação dos usuários")
 
 SECRET_KEY = 'secret'
 
