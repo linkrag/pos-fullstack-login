@@ -216,34 +216,40 @@ def delete_usuario(path: UsuarioPathSchema):
         return {"mesage": e.args}, 400
 
 
-@app.post('/login', tags=[auth_tag])
-def login():
+@app.post('/login', tags=[auth_tag],
+          responses={"200": AuthViewSchema, "404": ErrorSchema})
+def login(body: AuthSchema):
     """
-    User login to generate JWT token.
-    A senha enviada é comparada com o hash SHA256 armazenado.
+    User login para gerar token JWT.
+    O servidor recebe o username e a senha em SHA256 e se for encontrado no banco retonar um token JWT com validade de 1 hora.
     """
-    auth_data = request.json
-    username = auth_data.get("username")
-    password = auth_data.get("password")
+    
+    try:
+        # Achar usuário no banco
+        session = Session()
+        user = session.query(Usuario).filter(Usuario.username == body.username).first()
 
-    # Find user in the database
-    session = Session()
-    user = session.query(Usuario).filter(Usuario.username == username).first()
+        if user:
+            # Compara a senha enviada com a do banco
+            if user.pwd == body.pwd:
+                # Gera um token JWT de 1 hora
+                token = jwt.encode({
+                    'id': user.id,
+                    'username': user.username,
+                    'exp': datetime.utcnow() + timedelta(hours=1)
+                }, SECRET_KEY, algorithm="HS256")
+                
+                return jsonify(apresenta_token({'token': token if isinstance(token, str) else token.decode('utf-8')})), 200
 
-    if user:
-        # Compare the hashed password with the stored password
-        if user.pwd == password:
-            # Generate JWT token with expiration of 1 hour
-            token = jwt.encode({
-                'id': user.id,
-                'username': user.username,
-                'exp': datetime.utcnow() + timedelta(hours=1)  # Correct use of timedelta
-            }, SECRET_KEY, algorithm="HS256")
+        return jsonify({'message': 'Invalid credentials'}), 401
 
-            # Ensure the token is returned as a string (decode if necessary)
-            return jsonify({'token': token if isinstance(token, str) else token.decode('utf-8')}), 200
+    except IntegrityError as e:
+        logger.warning(f"Erro ao validar credenciais  {e.args}")
+        return {"mesage": e.args}, 409
 
-    return jsonify({'message': 'Invalid credentials'}), 401
+    except Exception as e:
+        logger.warning(f"Erro ao validar credenciais  {e.args}")
+        return {"mesage": e.args}, 400
     
 
 if __name__ == '__main__':  
