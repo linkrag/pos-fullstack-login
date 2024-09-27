@@ -39,7 +39,7 @@ $ python app.py
 Abra o [http://localhost:5002/#/](http://localhost:5002/#/) no navegador para verificar o status da API em execução.
 
 
-### Como executar (Docker)
+## Como executar (Docker)
 
 Basta realizar o comando docker build -t login-app .
 Em seguida: docker run -p 5002:5002 login-app
